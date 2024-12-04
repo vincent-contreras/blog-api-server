@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "rdbg",
+      "name": "Debug current file with rdbg",
+      "request": "launch",
+      "script": "./bin/rails s",
+      "useBundler": false,
+      "command": "ruby",
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
+      "env": {
+        "RAILS_ENV": "development",
+        "DB_HOST": "127.0.0.1",
+        "DB_PORT": "5432",
+        "DB_NAME": "blog_dev",
+        "DB_USER": "postgres",
+        "DB_PASSWORD": "securepassword",
+        "RAILS_MASTER_KEY": "7d2979545b3b9936a5db48c99aeaedbf",
+        "DB_TYPE": "postgresql"
+      }
+    },
+    {
+      "type": "rdbg",
+      "name": "Attach with rdbg",
+      "request": "attach"
+    }
+  ]
+}
