@@ -34,10 +34,17 @@ class UsersController < ApplicationController
     @token = encode_token(user_id: @user.id)
 
     if @user.save
-      render json: @user, status: :created, location: @user, token: @token
+      render json: {
+          user: UserSerializer.new(@user),
+          token: @token
+      }, status: :created
     else
       render json: @user.errors, status: :unprocessable_entity
     end
+  end
+
+  def me
+    render json: current_user, status: :ok
   end
 
   # PATCH/PUT /users/1
@@ -62,7 +69,7 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:username, :password, :first_name, :middle_name, :last_name)
+      params.permit(:username, :password, :first_name, :middle_name, :last_name)
     end
 
     def handle_invalid_record(e)
