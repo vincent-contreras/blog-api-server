@@ -3,13 +3,23 @@ class BlogsController < ApplicationController
 
   # GET /blogs
   def index
-    @blogs = Blog.all
+    user = current_user
+
+    @blogs = Blog.find_by(user: user)
 
     render json: @blogs
   end
 
   # GET /blogs/1
   def show
+    @blog = Blog.find_by(id: params[:id])
+    user = current_user
+
+    unless @blog&.user == user
+      render json: { error: "Blog not found" }, status: :not_found
+      return
+    end
+
     render json: @blog
   end
 
@@ -40,6 +50,14 @@ class BlogsController < ApplicationController
 
   # PATCH/PUT /blogs/1
   def update
+    @blog = Blog.find_by(id: params[:id])
+    user = current_user
+
+    unless @blog&.user == user
+      render json: { error: "Blog not found" }, status: :not_found
+      return
+    end
+
     if @blog.update(blog_params)
       render json: @blog
     else
@@ -49,6 +67,14 @@ class BlogsController < ApplicationController
 
   # DELETE /blogs/1
   def destroy
+    @blog = Blog.find_by(id: params[:id])
+    user = current_user
+
+    unless @blog&.user == user
+      render json: { error: "Blog not found" }, status: :not_found
+      return
+    end
+
     @blog.destroy!
   end
 
