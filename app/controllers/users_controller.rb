@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[ show update destroy ]
+  # before_action :set_user, only: %i[ show update destroy ]
+  skip_before_action :authorized, only: [ :create ]
+  rescue_from ActiveRecord::RecordInvalid, with: :handle_invalid_record
 
   # GET /users
   def index
@@ -13,12 +15,26 @@ class UsersController < ApplicationController
     render json: @user
   end
 
+  def me
+    render json: current_user, status: :ok
+  end
+
   # POST /users
   def create
-    @user = User.new(user_params)
+    puts params.inspect
+    puts user_params.inspect
+
+    @user = User.create!(
+      username: user_params[:username],
+      password: user_params[:password],
+      first_name: user_params[:first_name],
+      middle_name: user_params[:middle_name],
+      last_name: user_params[:last_name]
+    )
+    @token = encode_token(user_id: @user.id)
 
     if @user.save
-      render json: @user, status: :created, location: @user
+      render json: @user, status: :created, location: @user, token: @token
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -46,6 +62,10 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:username, :password_digest, :first_name, :middle_name, :last_name)
+      params.require(:user).permit(:username, :password, :first_name, :middle_name, :last_name)
+    end
+
+    def handle_invalid_record(e)
+      render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
     end
 end
