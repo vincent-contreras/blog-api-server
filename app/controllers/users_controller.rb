@@ -24,13 +24,7 @@ class UsersController < ApplicationController
     puts params.inspect
     puts user_params.inspect
 
-    @user = User.create!(
-      username: user_params[:username],
-      password: user_params[:password],
-      first_name: user_params[:first_name],
-      middle_name: user_params[:middle_name],
-      last_name: user_params[:last_name]
-    )
+    @user = User.create!(user_params)
     @token = encode_token(user_id: @user.id)
 
     if @user.save
